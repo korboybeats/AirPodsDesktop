@@ -128,7 +128,9 @@ void OnApply_dark_mode(const Fields &newFields)
 {
     LOG(Info, "OnApply_dark_mode: {}", newFields.dark_mode);
 
-    ApdApp->GetMainWindow()->ApplyTheme();
+    if (ApdApp->GetMainWindow()) {
+        ApdApp->GetMainWindow()->ApplyTheme();
+    }
 }
 
 class Manager : public Helper::Singleton<Manager>
