@@ -269,8 +269,11 @@ MainWindow::MainWindow(QWidget *parent) : QDialog{parent}
 
 void MainWindow::ApplyTheme()
 {
-    bool dark = Core::Settings::GetCurrent().dark_mode;
+    ApplyTheme(Core::Settings::GetCurrent().dark_mode);
+}
 
+void MainWindow::ApplyTheme(bool dark)
+{
     // MainWindow background
     Utils::Qt::SetPaletteColor(
         this, QPalette::Window, dark ? QColor{45, 45, 45} : Qt::white);

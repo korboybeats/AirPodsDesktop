@@ -56,6 +56,7 @@ public:
     }
 
     void UpdateState(const Core::AirPods::State &state);
+    void ApplyTheme(bool dark);
     void ApplyTheme();
     void Available();
     void Unavailable();

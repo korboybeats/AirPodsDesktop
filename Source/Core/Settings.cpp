@@ -129,7 +129,7 @@ void OnApply_dark_mode(const Fields &newFields)
     LOG(Info, "OnApply_dark_mode: {}", newFields.dark_mode);
 
     if (ApdApp->GetMainWindow()) {
-        ApdApp->GetMainWindow()->ApplyTheme();
+        ApdApp->GetMainWindow()->ApplyTheme(newFields.dark_mode);
     }
 }
 
