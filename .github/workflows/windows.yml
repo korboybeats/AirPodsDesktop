@@ -71,6 +71,9 @@ jobs:
           choco install cmake.install --version ${{ env.FIXED_CMAKE_VERSION }} --installargs 'ADD_CMAKE_TO_PATH=System' --force
           cmake --version
 
+      - name: Install NSIS
+        run: choco install nsis -y
+
       - name: Clone and bootstrap vcpkg
         working-directory: Build
         run: |
