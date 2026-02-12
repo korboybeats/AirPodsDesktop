@@ -124,6 +124,13 @@ void OnApply_battery_on_taskbar(const Fields &newFields)
     ApdApp->GetTaskbarStatus()->OnSettingsChangedSafely(newFields.battery_on_taskbar);
 }
 
+void OnApply_dark_mode(const Fields &newFields)
+{
+    LOG(Info, "OnApply_dark_mode: {}", newFields.dark_mode);
+
+    ApdApp->GetMainWindow()->ApplyTheme();
+}
+
 class Manager : public Helper::Singleton<Manager>
 {
 protected:

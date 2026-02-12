@@ -23,6 +23,7 @@
 #include <QCheckBox>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QApplication>
 #include <QDesktopServices>
 
 #include <Config.h>
@@ -45,7 +46,7 @@ public:
     TipLabel(QString text, QWidget *parent) : QLabel{content, parent}, _text{std::move(text)}
     {
         QPalette palette = this->palette();
-        palette.setColor(QPalette::WindowText, Qt::darkGray);
+        palette.setColor(QPalette::WindowText, Qt::gray);
         setPalette(palette);
     }
 
@@ -111,6 +112,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog{parent}
     _ui.cbLanguages->addItem("...");
 
     Update(GetCurrent(), false);
+    ApplyTheme();
 
     connect(
         _ui.buttonBox->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
@@ -144,6 +146,12 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog{parent}
     connect(_ui.hsMaxReceivingRange, &QSlider::valueChanged, this, [this](int value) {
         if (_trigger) {
             On_hsMaxReceivingRange_valueChanged(value);
+        }
+    });
+
+    connect(_ui.cbDarkMode, &QCheckBox::toggled, this, [this](bool checked) {
+        if (_trigger) {
+            On_cbDarkMode_toggled(checked);
         }
     });
 
@@ -273,6 +281,30 @@ void SettingsWindow::InitCreditsText()
     _ui.tbCredits->setHtml(l10nContributorsStr + libsStr);
 }
 
+void SettingsWindow::ApplyTheme()
+{
+    bool dark = GetCurrent().dark_mode;
+
+    if (dark) {
+        QPalette darkPalette;
+        darkPalette.setColor(QPalette::Window, QColor{45, 45, 45});
+        darkPalette.setColor(QPalette::WindowText, QColor{204, 204, 204});
+        darkPalette.setColor(QPalette::Base, QColor{35, 35, 35});
+        darkPalette.setColor(QPalette::AlternateBase, QColor{53, 53, 53});
+        darkPalette.setColor(QPalette::Text, QColor{204, 204, 204});
+        darkPalette.setColor(QPalette::Button, QColor{53, 53, 53});
+        darkPalette.setColor(QPalette::ButtonText, QColor{204, 204, 204});
+        darkPalette.setColor(QPalette::BrightText, Qt::red);
+        darkPalette.setColor(QPalette::Link, QColor{42, 130, 218});
+        darkPalette.setColor(QPalette::Highlight, QColor{42, 130, 218});
+        darkPalette.setColor(QPalette::HighlightedText, Qt::black);
+        setPalette(darkPalette);
+    }
+    else {
+        setPalette(QApplication::style()->standardPalette());
+    }
+}
+
 void SettingsWindow::RestoreDefaults()
 {
     Save(GetDefault());
@@ -286,6 +318,8 @@ void SettingsWindow::Update(const Fields &fields, bool trigger)
     auto currentLangIndex = ApdApp->GetCurrentLoadedLocaleIndex();
     _lastLanguageIndex = currentLangIndex;
     _ui.cbLanguages->setCurrentIndex(currentLangIndex);
+
+    _ui.cbDarkMode->setChecked(fields.dark_mode);
 
     _ui.cbAutoRun->setChecked(fields.auto_run);
 
@@ -348,6 +382,7 @@ void SettingsWindow::UpdateAdvOverride()
 void SettingsWindow::showEvent(QShowEvent *event)
 {
     Update(GetCurrent(), false);
+    ApplyTheme();
 }
 
 void SettingsWindow::On_cbLanguages_currentIndexChanged(int index)
@@ -379,6 +414,12 @@ void SettingsWindow::On_pbUnbind_clicked()
 {
     _ui.pbUnbind->setDisabled(true);
     ModifiableAccess()->device_address = 0;
+}
+
+void SettingsWindow::On_cbDarkMode_toggled(bool checked)
+{
+    ModifiableAccess()->dark_mode = checked;
+    ApplyTheme();
 }
 
 void SettingsWindow::On_cbDisplayBatteryOnTrayIcon_toggled(TrayIconBatteryBehavior behavior)

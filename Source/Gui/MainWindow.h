@@ -56,6 +56,7 @@ public:
     }
 
     void UpdateState(const Core::AirPods::State &state);
+    void ApplyTheme();
     void Available();
     void Unavailable();
     void Disconnect();

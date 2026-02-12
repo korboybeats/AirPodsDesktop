@@ -50,6 +50,7 @@ private:
     int _lastLanguageIndex{0};
 
     void InitCreditsText();
+    void ApplyTheme();
     void RestoreDefaults();
     void Update(const Fields &fields, bool trigger);
     void UpdateAdvOverride();
@@ -62,6 +63,7 @@ private:
     void On_pbUnbind_clicked();
 
     // Visual
+    void On_cbDarkMode_toggled(bool checked);
     void On_cbDisplayBatteryOnTrayIcon_toggled(TrayIconBatteryBehavior behavior);
     void On_cbDisplayBatteryOnTaskbar_toggled(TaskbarStatusBehavior behavior);
 

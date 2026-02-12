@@ -53,7 +53,8 @@ enum class LoadResult : uint32_t { AbiIncompatible, NoAbiField, Successful };
     callback(TrayIconBatteryBehavior, tray_icon_battery, {TrayIconBatteryBehavior::Disable},       \
         Impl::OnApply(&OnApply_tray_icon_battery))                                                 \
     callback(TaskbarStatusBehavior, battery_on_taskbar, {TaskbarStatusBehavior::Disable},          \
-        Impl::OnApply(&OnApply_battery_on_taskbar))
+        Impl::OnApply(&OnApply_battery_on_taskbar))                                              \
+    callback(bool, dark_mode, {false}, Impl::OnApply(&OnApply_dark_mode))
 // clang-format on
 
 struct Fields {
@@ -215,6 +216,7 @@ void OnApply_rssi_min(const Fields &newFields);
 void OnApply_device_address(const Fields &newFields);
 void OnApply_tray_icon_battery(const Fields &newFields);
 void OnApply_battery_on_taskbar(const Fields &newFields);
+void OnApply_dark_mode(const Fields &newFields);
 
 struct MetaFields {
 #define DECLARE_META_FIELD(type, name, dft, ...)                                                   \

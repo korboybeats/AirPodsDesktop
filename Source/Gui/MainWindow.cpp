@@ -27,6 +27,7 @@
 #include "../Error.h"
 #include "../Application.h"
 #include "../Core/AppleCP.h"
+#include "../Core/Settings.h"
 #include "SelectWindow.h"
 
 using namespace std::chrono_literals;
@@ -43,11 +44,18 @@ public:
         setFixedSize(25, 25);
     }
 
+    void SetDarkMode(bool dark)
+    {
+        _isDarkMode = dark;
+        repaint();
+    }
+
 Q_SIGNALS:
     void Clicked();
 
 private:
     bool _isHovering{false}, _isHoldDown{false};
+    bool _isDarkMode{false};
 
 protected:
     void paintEvent(QPaintEvent *event) override
@@ -91,14 +99,27 @@ protected:
             painter.setPen(Qt::NoPen);
 
             QColor color;
-            if (_isHoldDown) {
-                color = QColor{218, 218, 219};
-            }
-            else if (_isHovering) {
-                color = QColor{228, 228, 229};
+            if (_isDarkMode) {
+                if (_isHoldDown) {
+                    color = QColor{85, 85, 87};
+                }
+                else if (_isHovering) {
+                    color = QColor{77, 77, 79};
+                }
+                else {
+                    color = QColor{61, 61, 63};
+                }
             }
             else {
-                color = QColor{238, 238, 239};
+                if (_isHoldDown) {
+                    color = QColor{218, 218, 219};
+                }
+                else if (_isHovering) {
+                    color = QColor{228, 228, 229};
+                }
+                else {
+                    color = QColor{238, 238, 239};
+                }
             }
 
             painter.setBrush(QBrush{color});
@@ -111,7 +132,8 @@ protected:
     {
         painter.save();
         {
-            painter.setPen(QPen{QColor{131, 131, 135}, 3});
+            QColor xColor = _isDarkMode ? QColor{170, 170, 174} : QColor{131, 131, 135};
+            painter.setPen(QPen{xColor, 3});
             painter.setBrush(Qt::NoBrush);
 
             QSize size = this->size();
@@ -206,8 +228,6 @@ MainWindow::MainWindow(QWidget *parent) : QDialog{parent}
 
     Utils::Qt::SetRoundedCorners(this, 30);
     Utils::Qt::SetRoundedCorners(_ui.pushButton, 6);
-    Utils::Qt::SetPaletteColor(this, QPalette::Window, Qt::white);
-    Utils::Qt::SetPaletteColor(_ui.deviceLabel, QPalette::WindowText, QColor{94, 94, 94});
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this, &MainWindow::OnAppStateChanged);
     connect(_ui.pushButton, &QPushButton::clicked, this, &MainWindow::OnButtonClicked);
@@ -243,7 +263,54 @@ MainWindow::MainWindow(QWidget *parent) : QDialog{parent}
     _videoWidget->show();
 
     Unavailable();
+    ApplyTheme();
     _updateChecker.Start();
+}
+
+void MainWindow::ApplyTheme()
+{
+    bool dark = Core::Settings::GetCurrent().dark_mode;
+
+    // MainWindow background
+    Utils::Qt::SetPaletteColor(
+        this, QPalette::Window, dark ? QColor{45, 45, 45} : Qt::white);
+
+    // Device label text
+    Utils::Qt::SetPaletteColor(
+        _ui.deviceLabel, QPalette::WindowText,
+        dark ? QColor{204, 204, 204} : QColor{94, 94, 94});
+
+    // Close button
+    _closeButton->SetDarkMode(dark);
+
+    // Push button stylesheet
+    if (dark) {
+        _ui.pushButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: rgb(60, 60, 66);"
+            "  color: rgb(204, 204, 204);"
+            "  border: transparent;"
+            "}"
+            "QPushButton:hover { background-color: rgb(70, 70, 76); }"
+            "QPushButton:pressed { background-color: rgb(50, 50, 56); }");
+    }
+    else {
+        _ui.pushButton->setStyleSheet(
+            "QPushButton {"
+            "  background-color: rgb(212, 211, 217);"
+            "  border: transparent;"
+            "}"
+            "QPushButton:hover { background-color: rgb(222, 221, 227); }"
+            "QPushButton:pressed { background-color: rgb(202, 201, 207); }");
+    }
+
+    // Battery widget charging icon color
+    QColor chargingColor = dark ? Qt::white : Qt::black;
+    _leftBattery->setChargingIconColor(chargingColor);
+    _rightBattery->setChargingIconColor(chargingColor);
+    _caseBattery->setChargingIconColor(chargingColor);
+
+    update();
 }
 
 void MainWindow::UpdateState(const Core::AirPods::State &state)
