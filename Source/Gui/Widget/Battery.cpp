@@ -163,6 +163,7 @@ void Battery::drawText(QPainter &painter)
         QTextOption textOption;
         textOption.setWrapMode(QTextOption::NoWrap);
 
+        painter.setPen(_textColor);
         painter.drawText(_textRect, QString{"%1%"}.arg(_value), textOption);
     }
     painter.restore();
@@ -226,6 +227,11 @@ QColor Battery::getNormalColor() const
 QColor Battery::getChargingIconColor() const
 {
     return _chargingIconColor;
+}
+
+QColor Battery::getTextColor() const
+{
+    return _textColor;
 }
 
 bool Battery::isCharging() const
@@ -367,6 +373,15 @@ void Battery::setChargingIconColor(const QColor &value)
         return;
     }
     _chargingIconColor = value;
+    update();
+}
+
+void Battery::setTextColor(const QColor &value)
+{
+    if (_textColor == value) {
+        return;
+    }
+    _textColor = value;
     update();
 }
 

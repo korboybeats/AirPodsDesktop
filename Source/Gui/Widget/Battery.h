@@ -49,6 +49,7 @@ class Battery : public QWidget
     Q_PROPERTY(QColor borderColor READ getBorderColor WRITE setBorderColor)
     Q_PROPERTY(QColor alarmColor READ getAlarmColor WRITE setAlarmColor)
     Q_PROPERTY(QColor normalColor READ getNormalColor WRITE setNormalColor)
+    Q_PROPERTY(QColor textColor READ getTextColor WRITE setTextColor)
 
     Q_PROPERTY(bool isCharging READ isCharging WRITE setCharging)
     Q_PROPERTY(bool isShowText READ isShowText WRITE setShowText)
@@ -73,6 +74,7 @@ public:
     QColor getAlarmColor() const;
     QColor getNormalColor() const;
     QColor getChargingIconColor() const;
+    QColor getTextColor() const;
 
     bool isCharging() const;
     bool isShowText() const;
@@ -98,6 +100,7 @@ public Q_SLOTS:
     void setAlarmColor(const QColor &value);
     void setNormalColor(const QColor &value);
     void setChargingIconColor(const QColor &value);
+    void setTextColor(const QColor &value);
 
     void setCharging(bool value);
     void setShowText(bool value);
@@ -126,6 +129,7 @@ private:
     QColor _normalColor{101, 196, 102};
     QColor _alarmColor{235, 77, 61};
     QColor _chargingIconColor{Qt::black};
+    QColor _textColor{Qt::black};
 
     bool _isCharging{false};
     bool _isShowText{true};

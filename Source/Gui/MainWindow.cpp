@@ -307,11 +307,21 @@ void MainWindow::ApplyTheme(bool dark)
             "QPushButton:pressed { background-color: rgb(202, 201, 207); }");
     }
 
-    // Battery widget charging icon color
+    // Battery widget colors
     QColor chargingColor = dark ? Qt::white : Qt::black;
+    QColor textColor = dark ? QColor{204, 204, 204} : Qt::black;
     _leftBattery->setChargingIconColor(chargingColor);
     _rightBattery->setChargingIconColor(chargingColor);
     _caseBattery->setChargingIconColor(chargingColor);
+    _leftBattery->setTextColor(textColor);
+    _rightBattery->setTextColor(textColor);
+    _caseBattery->setTextColor(textColor);
+
+    // Video widget background (for letterboxing/padding areas)
+    QPalette videoPal = _videoWidget->palette();
+    videoPal.setColor(QPalette::Window, dark ? QColor{45, 45, 45} : Qt::white);
+    _videoWidget->setPalette(videoPal);
+    _videoWidget->setAttribute(Qt::WA_OpaquePaintEvent);
 
     update();
 }
