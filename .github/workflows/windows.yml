@@ -21,8 +21,8 @@ env:
   PLATFORM_NAME: Win32
   BUILD_TYPE: RelWithDebInfo
   UPLOAD_ARTIFACT: true
-  CACHE_DEPS: false
   FIXED_CMAKE_VERSION: 3.21.4
+  VCPKG_DEFAULT_TRIPLET: x86-windows
 
 jobs:
   Build:
@@ -34,56 +34,94 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
       - name: Prepare build directory
         run: mkdir Build
 
-      - name: Generate dependencies cache key
-        if: env.CACHE_DEPS == 'true'
-        run: |
-          curl -o Build/DepsRef.json https://api.github.com/repos/SpriteOvO/AirPodsDesktop-Deps/git/refs/heads/main
-          type DepsRef.json
+      - name: Cache CMake install
+        id: cache-cmake
+        uses: actions/cache@v4
+        with:
+          path: C:\Program Files\CMake
+          key: cmake-${{ env.FIXED_CMAKE_VERSION }}
 
-      - name: Dependencies cache
+      - name: Use a fixed version of CMake
+        if: steps.cache-cmake.outputs.cache-hit != 'true' && env.FIXED_CMAKE_VERSION != ''
+        run: |
+          choco install cmake.install --version ${{ env.FIXED_CMAKE_VERSION }} --installargs 'ADD_CMAKE_TO_PATH=System' --force
+
+      - name: Print CMake version
+        run: cmake --version
+
+      - name: Cache NSIS
+        id: cache-nsis
+        uses: actions/cache@v4
+        with:
+          path: C:\Program Files (x86)\NSIS
+          key: nsis-3
+
+      - name: Install NSIS
+        if: steps.cache-nsis.outputs.cache-hit != 'true'
+        run: choco install nsis -y
+
+      - name: Cache AirPodsDesktop-Deps
         id: cache-deps
-        if: env.CACHE_DEPS == 'true'
         uses: actions/cache@v4
         with:
           path: Build/AirPodsDesktop-Deps
-          key: ${{ hashFiles('Build/DepsRef.json') }}
+          key: airpods-deps-v1
 
       - name: Clone dependencies
-        if: env.CACHE_DEPS != 'true' || steps.cache-deps.outputs.cache-hit != 'true'
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         working-directory: Build
         run: |
           git clone --recursive https://github.com/SpriteOvO/AirPodsDesktop-Deps.git
           dir AirPodsDesktop-Deps
 
-      - name: Print CMake version
-        run: cmake --version
-
-      - name: Use a fixed version of CMake
-        if: env.FIXED_CMAKE_VERSION != ''
-        run: |
-          choco install cmake.install --version ${{ env.FIXED_CMAKE_VERSION }} --installargs 'ADD_CMAKE_TO_PATH=System' --force
-          cmake --version
-
-      - name: Install NSIS
-        run: choco install nsis -y
+      - name: Cache vcpkg
+        id: cache-vcpkg
+        uses: actions/cache@v4
+        with:
+          path: |
+            Build/vcpkg
+            !Build/vcpkg/buildtrees
+            !Build/vcpkg/downloads
+          key: vcpkg-${{ hashFiles('vcpkg.json') }}-x86-windows-v1
 
       - name: Clone and bootstrap vcpkg
+        if: steps.cache-vcpkg.outputs.cache-hit != 'true'
         working-directory: Build
         run: |
           git clone --recursive https://github.com/microsoft/vcpkg.git
           ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
 
+      - name: Bootstrap vcpkg (cached)
+        if: steps.cache-vcpkg.outputs.cache-hit == 'true'
+        working-directory: Build
+        run: |
+          if not exist vcpkg\vcpkg.exe (
+            ./vcpkg/bootstrap-vcpkg.bat -disableMetrics
+          )
+
+      - name: Cache build directory
+        uses: actions/cache@v4
+        with:
+          path: |
+            Build/${{ env.BUILD_TYPE }}
+            !Build/${{ env.BUILD_TYPE }}/Binary
+            !Build/${{ env.BUILD_TYPE }}/Installer
+          key: build-${{ hashFiles('vcpkg.json', 'CMakeLists.txt', 'Source/**') }}-v1
+          restore-keys: |
+            build-
+
       - name: Generate project and build
         working-directory: Build
         run: |
-          mkdir ${{ env.BUILD_TYPE }} && cd ${{ env.BUILD_TYPE }}
+          mkdir ${{ env.BUILD_TYPE }} 2>nul
+          cd ${{ env.BUILD_TYPE }}
 
           cmake -G "Visual Studio 17 2022" ^
                 -A ${{ env.PLATFORM_NAME }} ^
