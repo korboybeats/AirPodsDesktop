@@ -286,22 +286,113 @@ void SettingsWindow::ApplyTheme()
     bool dark = GetCurrent().dark_mode;
 
     if (dark) {
-        QPalette darkPalette;
-        darkPalette.setColor(QPalette::Window, QColor{45, 45, 45});
-        darkPalette.setColor(QPalette::WindowText, QColor{204, 204, 204});
-        darkPalette.setColor(QPalette::Base, QColor{35, 35, 35});
-        darkPalette.setColor(QPalette::AlternateBase, QColor{53, 53, 53});
-        darkPalette.setColor(QPalette::Text, QColor{204, 204, 204});
-        darkPalette.setColor(QPalette::Button, QColor{53, 53, 53});
-        darkPalette.setColor(QPalette::ButtonText, QColor{204, 204, 204});
-        darkPalette.setColor(QPalette::BrightText, Qt::red);
-        darkPalette.setColor(QPalette::Link, QColor{42, 130, 218});
-        darkPalette.setColor(QPalette::Highlight, QColor{42, 130, 218});
-        darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-        setPalette(darkPalette);
+        setStyleSheet(
+            "QDialog, QWidget#general, QWidget#visual, QWidget#features, QWidget#about, QWidget#debug {"
+            "  background-color: #2D2D2D;"
+            "  color: #CCCCCC;"
+            "}"
+            "QTabWidget::pane {"
+            "  background-color: #2D2D2D;"
+            "  border: 1px solid #555555;"
+            "}"
+            "QTabBar::tab {"
+            "  background-color: #353535;"
+            "  color: #CCCCCC;"
+            "  padding: 6px 12px;"
+            "  border: 1px solid #555555;"
+            "  border-bottom: none;"
+            "}"
+            "QTabBar::tab:selected {"
+            "  background-color: #2D2D2D;"
+            "}"
+            "QTabBar::tab:hover:!selected {"
+            "  background-color: #404040;"
+            "}"
+            "QLabel {"
+            "  color: #CCCCCC;"
+            "  background: transparent;"
+            "}"
+            "QCheckBox, QRadioButton {"
+            "  color: #CCCCCC;"
+            "  background: transparent;"
+            "}"
+            "QCheckBox::indicator, QRadioButton::indicator {"
+            "  border: 1px solid #888888;"
+            "  background-color: #353535;"
+            "  width: 13px; height: 13px;"
+            "}"
+            "QCheckBox::indicator:checked {"
+            "  background-color: #2A82DA;"
+            "  border-color: #2A82DA;"
+            "}"
+            "QRadioButton::indicator {"
+            "  border-radius: 7px;"
+            "}"
+            "QRadioButton::indicator:checked {"
+            "  background-color: #2A82DA;"
+            "  border-color: #2A82DA;"
+            "}"
+            "QPushButton {"
+            "  background-color: #3C3C42;"
+            "  color: #CCCCCC;"
+            "  border: 1px solid #555555;"
+            "  padding: 5px 15px;"
+            "  border-radius: 3px;"
+            "}"
+            "QPushButton:hover { background-color: #464650; }"
+            "QPushButton:pressed { background-color: #323238; }"
+            "QPushButton:disabled { color: #666666; }"
+            "QComboBox {"
+            "  background-color: #353535;"
+            "  color: #CCCCCC;"
+            "  border: 1px solid #555555;"
+            "  padding: 3px 6px;"
+            "}"
+            "QComboBox::drop-down { border: none; }"
+            "QComboBox QAbstractItemView {"
+            "  background-color: #353535;"
+            "  color: #CCCCCC;"
+            "  selection-background-color: #2A82DA;"
+            "}"
+            "QSlider::groove:horizontal {"
+            "  background: #555555;"
+            "  height: 4px;"
+            "}"
+            "QSlider::handle:horizontal {"
+            "  background: #2A82DA;"
+            "  width: 14px;"
+            "  margin: -5px 0;"
+            "  border-radius: 7px;"
+            "}"
+            "QTextBrowser {"
+            "  background-color: #232323;"
+            "  color: #CCCCCC;"
+            "  border: none;"
+            "}"
+            "QGroupBox {"
+            "  color: #CCCCCC;"
+            "  border: 1px solid #555555;"
+            "  margin-top: 8px;"
+            "  padding-top: 8px;"
+            "}"
+            "QGroupBox::title {"
+            "  color: #CCCCCC;"
+            "}"
+            "QTextEdit {"
+            "  background-color: #232323;"
+            "  color: #CCCCCC;"
+            "  border: 1px solid #555555;"
+            "}"
+            "QDialogButtonBox QPushButton {"
+            "  min-width: 80px;"
+            "}"
+            "Line {"
+            "  color: #555555;"
+            "}"
+        );
     }
     else {
-        setPalette(QApplication::style()->standardPalette());
+        setStyleSheet({});
     }
 }
 
