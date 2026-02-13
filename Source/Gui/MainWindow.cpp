@@ -309,7 +309,7 @@ void MainWindow::ApplyTheme(bool dark)
 
     // Battery widget colors
     QColor chargingColor = dark ? Qt::white : Qt::black;
-    QColor textColor = dark ? QColor{204, 204, 204} : Qt::black;
+    QColor textColor = dark ? QColor{Qt::white} : Qt::black;
     _leftBattery->setChargingIconColor(chargingColor);
     _rightBattery->setChargingIconColor(chargingColor);
     _caseBattery->setChargingIconColor(chargingColor);
